@@ -1,0 +1,7 @@
+
+            while (Num(lex.charAt(i))){
+                i++;
+            }
+
+                i++;
+                while (Num(lex.charAt(i))){ 0;
