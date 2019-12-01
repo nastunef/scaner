@@ -1,0 +1,28 @@
+class main {
+
+    int Main(){
+        int fileName;
+        double der;
+        int lel = fileName;
+}
+ class pop{
+ int a1;
+ int b(){
+ int a;
+ int g;
+ while(a == g){
+//int l = b + 2 + 4 * c * ();
+return 1;
+ }
+ int l = g + 2 + 4;
+ int k = l;
+
+ }
+
+
+ }
+ pop a = new pop();
+ pop b = new pop();
+
+        }
+}

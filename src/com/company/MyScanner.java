@@ -5,9 +5,14 @@ import static com.company.Constans.*;
 public class MyScanner {
 
     public int tek_i;
+    public int str;
+    public String nameId;
+    public int MAXLEX = 15;
 
     public MyScanner() {
+
         tek_i = 0;
+        str = 1;
     }
 
     public boolean Num(char t) {
@@ -35,11 +40,32 @@ public class MyScanner {
         }
         return false;
     }
-
+    public boolean it_is_new(String lex, int i) {
+        if (i + 3 <= lex.length()) {
+            if (lex.charAt(i) == 'n' && lex.charAt(i + 1) == 'e' && lex.charAt(i + 2) == 'w' && (((lex.length() - 1 >= i + 3)
+                    && (Num(lex.charAt(i + 3)) == false)) || (lex.length() == i + 3))) {
+                tek_i = i + 3;
+                return true;
+            }
+        }
+        return false;
+    }
     public boolean it_is_double(String lex, int i) {
         if (i + 5 <= lex.length() - 1) {
             if (lex.charAt(i) == 'd' && lex.charAt(i + 1) == 'o' && lex.charAt(i + 2) == 'u' && lex.charAt(i + 3) == 'b' &&
                     lex.charAt(i + 4) == 'l' && lex.charAt(i + 5) == 'e' && (((lex.length() - 1 >= i + 6)
+                    && (Num(lex.charAt(i + 6)) == false)) || (lex.length() == i + 6))) {
+                tek_i = i + 6;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean it_is_return(String lex, int i) {
+        if (i + 5 <= lex.length() - 1) {
+            if (lex.charAt(i) == 'r' && lex.charAt(i + 1) == 'e' && lex.charAt(i + 2) == 't' && lex.charAt(i + 3) == 'u' &&
+                    lex.charAt(i + 4) == 'r' && lex.charAt(i + 5) == 'n' && (((lex.length() - 1 >= i + 6)
                     && (Num(lex.charAt(i + 6)) == false)) || (lex.length() == i + 6))) {
                 tek_i = i + 6;
                 return true;
@@ -71,6 +97,17 @@ public class MyScanner {
         }
         return false;
     }
+    public boolean it_is_break(String lex, int i) {
+        if (i + 4 <= lex.length() - 1) {
+            if (lex.charAt(i) == 'b' && lex.charAt(i + 1) == 'r' && lex.charAt(i + 2) == 'e' && lex.charAt(i + 3) == 'a' &&
+                    lex.charAt(i + 4) == 'k' && (((lex.length() - 1 >= i + 5)
+                    && (Num(lex.charAt(i + 5)) == false)) || (lex.length() == i + 5))) {
+                tek_i = i + 5;
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean it_is_main(String lex, int i) {
         if (i + 3 <= lex.length() - 1) {
@@ -84,19 +121,26 @@ public class MyScanner {
     }
 
     public boolean it_is_id(String lex, int i) {
+        int j =0;
+        char NameId[] = new char[MAXLEX];
+        String s;
         while (HexLetter(lex.charAt(i)) || lex.charAt(i) == '_' || Num(lex.charAt(i))) {
+            NameId[j] = lex.charAt(i);;
+            j++;
             if (i + 1 == lex.length()) {
                 tek_i = i + 1;
                 return true;
             }
             i++;
         }
+
+        nameId = String.valueOf(NameId);
         tek_i = i;
         return true;
     }
 
     public boolean it_is_double_ex(String lex, int i) {
-        if (i <= lex.length()) {
+        if (i >= lex.length()) {
             return false;
         }
         while (Num(lex.charAt(i))) {
@@ -134,24 +178,41 @@ public class MyScanner {
             }
         } else return false;
     }
-
-    public int scanner(String lex, int i) {
+    public int nextProbel(String lex, int i){
         while (lex.charAt(i) == ' ' || lex.charAt(i) == '\n' || lex.charAt(i) == '\t' || lex.charAt(i) == '\r') {
+            if(lex.charAt(i) == '\n'){
+                str += 1;
+            }
             if (i + 1 == lex.length()) {
                 tek_i = i + 1;
                 return END;
             }
             i++;
         }
+        tek_i = i;
+        return OK;
+    }
+    public int scanner(String lex, int i) {
+        if (lex.length()<= i)
+            return ERROR;
+        if(nextProbel(lex, i) == END)
+            return END;
+        i = tek_i;
         if (lex.charAt(i) == '/') {
             if (i + 1 <= lex.length()) {
                 if (lex.charAt(i + 1) == '/') {
                     while (lex.charAt(i) != '\n' || lex.charAt(i) == '\r') {
                         i++;
+
                         if (i + 1 == lex.length()) {
-                            return 0;
+                            return END;
                         }
                     }
+
+                    if(nextProbel(lex, i) == END)
+                        return END;
+                    i = tek_i;
+
                 } else {
                     tek_i = i + 1;
                     return SLASH;
@@ -177,9 +238,19 @@ public class MyScanner {
             if (it_is_while(lex, i)) {
                 return WHILE;
             }
+            if(it_is_break(lex,i)){
+                return BREAK;
+            }
+            if(it_is_return(lex,i)){
+                return RETURN;
+            }
+            if(it_is_new(lex,i)){
+                return NEW;
+            }
             if (it_is_id(lex, i)) {
                 return ID;
             }
+
         } else if (Num(lex.charAt(i))) {
             while (Num(lex.charAt(i))) {
                 if (i + 1 == lex.length()) {
@@ -194,14 +265,14 @@ public class MyScanner {
                     return TYPE_DOUBL;
                 } else {
                     tek_i = lex.length();
-                    return ERROR1;
+                    return ERROR;
                 }
             } else if (HexLetter(lex.charAt(i)) == false) {
                 tek_i = i;
                 return TYPE_IN;
             } else if (HexLetter(lex.charAt(i)) == true) {
                 tek_i = lex.length();
-                return ERROR1;
+                return ERROR;
             }
         } else if (lex.charAt(i) == '-') {
             tek_i = i + 1;
@@ -264,9 +335,17 @@ public class MyScanner {
             }
             tek_i = i + 1;
             return LESS;
-        } else {
+        } else if (lex.charAt(i) == '!') {
+            if (i + 1 < lex.length()) {
+                if (lex.charAt(i + 1) == '=') {
+                    tek_i = i + 2;
+                    return NOT_EQUAL;
+                }
+            }
+            return ERROR;
+        }else{
             tek_i = lex.length();
-            return ERROR1;
+            return ERROR;
         }
     }
 }

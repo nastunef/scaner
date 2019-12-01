@@ -1,33 +1,43 @@
 package com.company;
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import static com.company.Constans.*;
 
 public class Main {
 
-    // читаем файл в строку с помощью класса Files
+    public static void main(String[] args) throws IOException {
+        //java -cp C:\Users\nastu\OneDrive\Документы\NetBeansProjects\scaner\src com.company.Main
+        //java -cp /home/anastasiya/Документы/проекты/scaner/src com.company.Main main.txt
+        //java -cp /home/anastasiya/Документы/проекты/scaner/out/production/scaner com.company.Main main.txt
+        // java -cp /home/anastasiya/Документы/проекты/scaner/src Constans.java MyScanner.java SyntaxAnalize.java Main.java
+        //String fileName = args[0].toString();
+        String fileName = "main.txt";
+        String contents = readUsingFiles(fileName);
+
+        ArrayList<Integer> codOfLex = new ArrayList();
+        boolean SyntaxAnalize = true;
+        MyScanner sc = new MyScanner();
+        SyntaxAnalize sa = new SyntaxAnalize(contents);
+        sa.ItsProgram();
+        /*
+        while(sc.tek_i != contents.length()) {
+            int a = sc.scanner(contents, sc.tek_i);
+            codOfLex.add(a);
+            System.out.print(a + " ");
+        }
+
+         */
+
+
+
+    }
     private static String readUsingFiles(String fileName) throws IOException {
         return new String(Files.readAllBytes(Paths.get(fileName)));
     }
-    public static void main(String[] args) throws IOException {
-	// write your code here
-        MyScanner sc = new MyScanner();
-        String fileName = "data.txt";
-
-        // читаем файл в строку с помощью класса Files
-        String contents = readUsingFiles(fileName);
-
-        String lex = "12.12e+1  2 ldkf1.; /double class int Publish()";
-
-        while(sc.tek_i != contents.length()) {
-            int a = sc.scanner(contents, sc.tek_i);
-            if(a == 100){
-                System.out.println("Неизвестный символ!");
-            }
-            System.out.println(a);
-        }
-
-    }
 }
+
+//String fileName = "data.txt";
+// читаем файл в строку с помощью класса Files

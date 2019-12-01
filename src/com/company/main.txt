@@ -1,0 +1,11 @@
+class main {
+
+    int main(){
+        //java -cp C:\Users\nastu\OneDrive\Документы\NetBeansProjects\scaner\src com.company.Main
+        //va
+
+        String fileName = args.toString;
+        String contents = readUsingFiles;
+
+        }
+        }

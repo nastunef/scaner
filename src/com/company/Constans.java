@@ -10,6 +10,9 @@ public class Constans {
     static final int CLASS = 14;
     static final int MAIN = 15;
     static final int ID = 16;
+    static final int NEW = 17;
+    static final int BREAK = 18;
+    static final int RETURN = 19;
     static final int ASSIGN = 20;
     static final int EQUAL = 21;
     static final int MORE = 22;
@@ -24,11 +27,14 @@ public class Constans {
     static final int DOT = 33;
     static final int STAR = 34;
     static final int PERCENT = 35;
+    static final int NOT_EQUAL = 36;
     static final int CURLY_BRACE_OPEN = 40;
     static final int CURLY_BRACE_CLOSE = 41;
     static final int COMMA = 42;
     static final int VIRGULE = 45;
-    static final int ERROR1 = 100;
+    static final int OK = 90;
+    static final int NEXT = 95;
+    static final int ERROR = 100;
     static final int END = 200;
-
+    static final int EMPTY = -1;
 }
