@@ -56,7 +56,7 @@ public class SyntaxAnalize {
             if (tec_iterat == MAIN) {
                 //добавили маин в дерево
                 IdClass[iForClass] = "Main";
-                TREE = TREE.SemInclude(CLASS, com.company.DATA_TYPE.TYPE_CLASS, IdClass[iForClass], "MAIN");
+                TREE = TREE.addClassMain();
                 if (TREE == null) {
                     return ERROR;
                 }
@@ -235,7 +235,6 @@ public class SyntaxAnalize {
             return OK;
         } else if (tec_iterat == ASSIGN) {
             TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
-            System.out.println(sc.nameId + '!');
             if (TREE == null) {
                 return ERROR;
             }
@@ -460,7 +459,6 @@ public class SyntaxAnalize {
                 return ERROR;
             }
             Type_lex = Type_method;
-            System.out.println(Type_lex);
             getNextLex();
             if (ItsV1() == OK) {
                 if (tec_iterat == COMMA) {
@@ -609,7 +607,6 @@ public class SyntaxAnalize {
             if (tec_iterat == ID) {
                 //проверить правильный ли ид класса при объялении соответвует ли типу(tec_type == ID)(1)OK
                 if (nameClass.equals(sc.nameId) == false) {
-                    System.out.println(nameClass + sc.nameId);
                     printError("Ошибка при объявлении экземпляра класса в строке ");
                     return ERROR;
                 }
@@ -715,7 +712,7 @@ public class SyntaxAnalize {
                 getNextLex();
                 return OK;
             } else {
-                printError("Ошибка. Присваемаемое значение не соответствует типу переменной) строка ");
+                printError("Ошибка. Присваемаемое значение не соответствует типу переменной. строка ");
                 return ERROR;
             }
         } else

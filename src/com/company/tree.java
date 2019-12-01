@@ -68,7 +68,7 @@ public class tree {
     tree FindUp(tree From, String nameLex) {
         //Поиск данных в дереве до его корня вверх по связям
         tree i = From;
-        while ((i != null) && (i.n.NameLex.equals(nameLex) == false)){
+        while ((i != null) && (!nameLex.equals(i.n.NameLex))){
             i = i.Up;
         }
         return i;
@@ -86,7 +86,6 @@ public class tree {
     tree FindUpOneLevel(tree From, String nameLex, DATA_TYPE typeOfLex) {
         tree i = From;
         while ((i != null) && (i.Up.Right != i)) {
-            System.out.println(nameLex + i.n.NameLex + i.n.TypeOfLex);
             if (nameLex.equals(i.n.NameLex) && typeOfLex == i.n.TypeOfLex) {
                 return i;
             }
@@ -133,6 +132,11 @@ public class tree {
         Node b = new Node(Constans.WHILE, DATA_TYPE.TYPE_WHILE, IdClass, "");
 
         return addMethodOrClass(b);
+    }
+    tree addClassMain(){
+        Node main = new Node(Constans.CLASS,DATA_TYPE.TYPE_CLASS,"Main","Main");
+        Cur = new tree();
+        return addMethodOrClass(main);
     }
     tree addMethodOrClass(Node b) {
 

@@ -23,6 +23,4 @@ return 1;
  }
  pop a = new pop();
  pop b = new pop();
-
-        }
 }
