@@ -4,23 +4,27 @@ class main {
         int fileName;
         double der;
         int lel = fileName;
-}
- class pop{
- int a1;
- int b(){
- int a;
- int g;
- while(a == g){
-//int l = b + 2 + 4 * c * ();
-return 1;
- }
- int l = g + 2 + 4;
- int k = l;
+        return 1;
+    }
+    class pop{
+        int a1;
+        int b;
+        int c;
+        int b(){
+            int a;
+            int g = a;
+            while(a == g){
+                int l = g + 2 + 4 * c + (4);
+                //return a;
+            }
+            int l = g + 2 + 4;
+            int k = l;
+        return 1;
+        }
+        int k;
+     }
+     pop a = new pop();
+     pop b = new pop();
+     int l = a.b() + (1 +2);
 
- }
-
-
- }
- pop a = new pop();
- pop b = new pop();
 }

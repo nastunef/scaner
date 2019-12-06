@@ -17,6 +17,7 @@ public class SyntaxAnalize {
     public int tec_iterat;
     private String content;
     private MyScanner sc;
+    private boolean itsWhile;
     //тип лексемы
     public int Type_lex;
     public int Type_method;
@@ -28,12 +29,15 @@ public class SyntaxAnalize {
     public String IdClass[] = new String[5];
     //дерево для поиска
     private tree treeForSearch;
+    private  boolean roundBrace;
+
 
     SyntaxAnalize(String newContent) {
         tec_iterat = 0;
         content = newContent;
         sc = new MyScanner();
         iForClass = 0;
+        itsWhile = false;
 
     }
 
@@ -86,9 +90,10 @@ public class SyntaxAnalize {
         if (tec_iterat == CLASS) {
             getNextLex();
             if (tec_iterat == ID) {
-                iForClass++;
+
                 //проверка на существование класса, если нет то внести в дерево
                 TREE = TREE.SemInclude(CLASS, com.company.DATA_TYPE.TYPE_CLASS, IdClass[iForClass], sc.nameId);
+                iForClass++;
                 if (TREE == null) {
                     return ERROR;
                 }
@@ -138,6 +143,7 @@ public class SyntaxAnalize {
             Type_lex = tec_iterat;
             if (tec_iterat == ID) {
                 nameClass = sc.nameId;
+                Type_lex = CLASS;
             }
             getNextLex();
             return OK;
@@ -190,13 +196,19 @@ public class SyntaxAnalize {
                     Type_method = Type_lex;
                     getNextLex();
                     if (ItsOperatorAndOperands() == OK) {
+                        if(tec_iterat == RETURN){
+                            ItsReturn();
+                        }
+                        else {
+                            printError("Ожилася return в строке ");
+                        }
                         if (tec_iterat == CURLY_BRACE_CLOSE) {
                             TREE = TREE.SetCur();
                             Type_method = 0;
                             getNextLex();
                             return OK;
                         } else {
-                            printError("Ожидалась } в строке ");
+                            printError("Ошибка в строке  ");
                             return ERROR;
                         }
                     } else {
@@ -263,7 +275,7 @@ public class SyntaxAnalize {
 
     }
 
-    public int ItsData() {
+   /* public int ItsData() {
         int a = ItsList();
         if (a == OK) {
             if (tec_iterat == COMMA) {
@@ -278,7 +290,7 @@ public class SyntaxAnalize {
             return ERROR;
         else
             return NEXT;
-    }
+    }*/
 
     public int ItsNameN() {
         //ПРОВЕРКА НА СУЩЕСТВОВАНИЕ ПЕРЕМЕННОЙ
@@ -287,17 +299,21 @@ public class SyntaxAnalize {
         if (treeForSearch == null) {
             treeForSearch = TREE;
         }
+
         if (tec_iterat == ID) {
-            tree searchNode = TREE.FindUpOneLevel(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_CLASS);
+            tree searchNode;
+
+            searchNode = treeForSearch.FindInClass(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN);
             getNextLex();
-            if (searchNode != null) {
+
+            if (searchNode != null && searchNode.n.LexType == CLASS) {
                 if (tec_iterat == DOT) {
                     getNextLex();
                     if (tec_iterat != ID) {
                         printError("После точки ожидалось продолжение. Строка ");
                         return ERROR;
                     } else {
-                        treeForSearch = searchNode;
+                        treeForSearch = TREE.GetClass(TREE,searchNode.n.IdClassLex);
                         while (treeForSearch.Left != null) {
                             treeForSearch = treeForSearch.Left;
                         }
@@ -309,24 +325,30 @@ public class SyntaxAnalize {
                 }
 
             }
-            searchNode = treeForSearch.FindUpOneLevel(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN);
-            if (searchNode != null) {
-                if (tec_iterat == DOT) {
-                    printError(sc.nameId.toString() + " это переменная, послне нее не должно быть точки. Строка ");
-                    return ERROR;
-                } else if (tec_iterat != CURLY_BRACE_OPEN) {
-                    if (Type_lex == WHILE) {
-                        Type_lex = searchNode.n.LexType;
-                    }
-                    if (searchNode.n.LexType == Type_lex) {
-                        return OK;
-                    } else {
-                        printError("Несоответствие типов в строке ");
+            if(tec_iterat != ROUND_BRACE_OPEN) {
+                //searchNode = treeForSearch.FindUpOneLevel(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN);
+                if (searchNode != null) {
+                    if (tec_iterat == DOT) {
+                        printError(sc.nameId.toString() + " это переменная, послне нее не должно быть точки. Строка ");
                         return ERROR;
+                    } else if (tec_iterat != CURLY_BRACE_OPEN) {
+                        if (Type_lex == WHILE) {
+                            Type_lex = searchNode.n.LexType;
+                        }
+                        if (searchNode.n.LexType == Type_lex) {
+                            if(tec_iterat == ROUND_BRACE_CLOSE && roundBrace){
+                                getNextLex();
+                                roundBrace = false;
+                            }
+                            return OK;
+                        } else {
+                            printError("Несоответствие типов в строке ");
+                            return ERROR;
+                        }
                     }
                 }
             }
-            searchNode = treeForSearch.FindUpOneLevel(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_METHOD);
+            searchNode = treeForSearch.FindInClass(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_METHOD);
             if (searchNode != null) {
                 if (tec_iterat == DOT) {
                     printError(sc.nameId.toString() + " это метод, после метода не должно быть точки. Строка ");
@@ -338,6 +360,10 @@ public class SyntaxAnalize {
                         if (Type_lex == WHILE) {
                             Type_lex = searchNode.n.LexType;
                         } else if (Type_lex == searchNode.n.LexType) {
+                            if(tec_iterat == ROUND_BRACE_CLOSE && roundBrace){
+                                getNextLex();
+                                roundBrace = false;
+                            }
                             return OK;
                         } else {
                             printError("Несоответствие типов в строке ");
@@ -383,7 +409,7 @@ public class SyntaxAnalize {
     }
 
     public int ItsOperatorAndOperands() {
-        while (tec_iterat != CURLY_BRACE_CLOSE) {
+        while (tec_iterat != CURLY_BRACE_CLOSE && tec_iterat != RETURN) {
             if (ItsTypeData() == OK) {
                 int a = ItsID();
                 if (a == OK) {
@@ -426,7 +452,7 @@ public class SyntaxAnalize {
                 if (tec_iterat == ID) {
                     //проверка существования переменной
                     tree Search;
-                    if ((Search = TREE.FindUpOneLevel(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN)) == null) {
+                    if ((Search = TREE.FindInClass(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN)) == null) {
                         printError("Переменная не объявлена. Строка ");
                         return ERROR;
                     }
@@ -539,7 +565,7 @@ public class SyntaxAnalize {
     }
 
 
-    public int ItsList() {
+  /*  public int ItsList() {
         int a = ItsPeremen();
         if (a == OK) {
             if (tec_iterat == VIRGULE) {
@@ -550,9 +576,9 @@ public class SyntaxAnalize {
         } else if (a == ERROR)
             return ERROR;
         else return NEXT;
-    }
+    }*/
 
-    public int ItsPeremen() {
+    /*public int ItsPeremen() {
         if (tec_iterat == ID) {
             //проверить обявлена ли она(2)OK
             if (TREE.DupControl(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN) == 0) {
@@ -592,10 +618,9 @@ public class SyntaxAnalize {
         } else if (tec_iterat == VIRGULE || tec_iterat == EQUAL || tec_iterat == COMMA)
             return NEXT;
         else return ERROR;
-    }
+    }*/
 
     public int ItsExempleClass() {
-
         if (tec_iterat == NEW) {
             //проверить есть ли такой класс(2)OK
             if (TREE.SemGetClass(nameClass) == null) {
@@ -636,6 +661,10 @@ public class SyntaxAnalize {
 
     public int ItsV1() {
         treeForSearch = null;
+        if(tec_iterat == ROUND_BRACE_OPEN){
+            roundBrace = true;
+            getNextLex();
+        }
         int a = ItsElement();
         if (a == OK) {
             if (tec_iterat == EQUAL || tec_iterat == NOT_EQUAL) {
@@ -690,7 +719,7 @@ public class SyntaxAnalize {
     }
 
     public int ItsElement() {
-        //вот тут обнулить переменную для итснаме
+
         int itsNameN = ItsNameN();
         if (itsNameN == OK) {
             return OK;
@@ -710,6 +739,10 @@ public class SyntaxAnalize {
         if (tec_iterat == TYPE_IN || tec_iterat == TYPE_DOUBL) {
             if ((tec_iterat == TYPE_IN && Type_lex == INT) || (tec_iterat == TYPE_DOUBL && Type_lex == DOUBLE)) {
                 getNextLex();
+                if(tec_iterat == ROUND_BRACE_CLOSE && roundBrace){
+                    getNextLex();
+                    roundBrace = false;
+                }
                 return OK;
             } else {
                 printError("Ошибка. Присваемаемое значение не соответствует типу переменной. строка ");

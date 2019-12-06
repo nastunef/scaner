@@ -93,6 +93,48 @@ public class tree {
         }
         return null;
     }
+    tree FindInMethod(tree From, String nameLex, DATA_TYPE typeOfLex){
+        tree i = From;
+        while((i!=null) && i.n.TypeOfLex != DATA_TYPE.TYPE_METHOD){
+            if (nameLex.equals(i.n.NameLex) && i.n.TypeOfLex == typeOfLex) {
+                return i;
+            }
+            i = i.Up;
+        }
+        return null;
+    }
+    tree FindInClass(tree From, String nameLex, DATA_TYPE typeOfLex){
+        tree i = From;
+        String nameClass = i.n.IdClassLex;
+        while((i!=null) &&  i.n.IdClassLex.equals(nameClass)){
+            if (nameLex.equals(i.n.NameLex ) && i.n.TypeOfLex == typeOfLex ) {
+                return i;
+            }
+            i = i.Up;
+        }
+        return null;
+
+    }
+
+
+    tree FindUpTwoLevel(tree From, String nameLex, DATA_TYPE typeOfLex){
+        tree i = From;
+        while ((i != null) && (i.Up.Right != i)) {
+            if (nameLex.equals(i.n.NameLex) && typeOfLex == i.n.TypeOfLex) {
+                return i;
+            }
+            i = i.Up;
+        }
+        if (i != null) {
+            while ((i != null) && (i.Up.Right != i)) {
+                if (nameLex.equals(i.n.NameLex) && typeOfLex == i.n.TypeOfLex) {
+                    return i;
+                }
+                i = i.Up;
+            }
+        }
+        return null;
+    }
     tree goUp(tree From){
         tree v = From;
         while(v!=v.Up.Right && v!=null){
@@ -145,8 +187,14 @@ public class tree {
         Cur = Cur.Left;
         // это точка возврата после выхода из метода/класса
         v.addLast(Cur);
-        b = new Node(Constans.EMPTY, DATA_TYPE.TYPE_UNIKNOW, "", "");
-        Cur.setRight(b);
+        String nameClass;
+        if(b.TypeOfLex == DATA_TYPE.TYPE_CLASS) {
+            nameClass = b.NameLex;
+        }else {
+            nameClass = b.IdClassLex;
+        }
+        Node c = new Node(Constans.EMPTY, DATA_TYPE.TYPE_UNIKNOW, nameClass, "");
+        Cur.setRight(c);
         // сделали пустую вершину  для вложеных объявлений
         Cur = Cur.Right;
         return v.getLast();
@@ -237,6 +285,14 @@ public class tree {
                return null;
             }
         return v;
+    }
+    tree GetClass(tree From,String nameClass){
+        tree Search = FindUp(From, nameClass);
+        if(Search != null){
+            return Search.Right;
+        }
+        return null;
+
     }
 
     int DupControl(tree Addr, String nameLex, DATA_TYPE t) {
