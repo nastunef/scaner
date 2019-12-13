@@ -7,20 +7,23 @@ class main {
         return 1;
     }
     class pop{
-        int a1;
+        int a1, xx,yy,zz;
         int b;
         int c;
         int b(){
             int a;
+            int a1, xx,yy,zz;
             int g = a;
-            while(a == g){
+            double r;
+            while(a >= g){
                 int l = g + 2 + 4 * c + (4);
-                //return a;
+                return a;
             }
             int l = g + 2 + 4;
             int k = l;
         return 1;
         }
+        int a = new pop();
         int k;
      }
      pop a = new pop();

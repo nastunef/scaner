@@ -19,9 +19,11 @@ public class Main {
 
         ArrayList<Integer> codOfLex = new ArrayList();
         boolean SyntaxAnalize = true;
-        MyScanner sc = new MyScanner();
-        SyntaxAnalize sa = new SyntaxAnalize(contents);
-        sa.ItsProgram();
+        //MyScanner sc = new MyScanner();
+        //SyntaxAnalize sa = new SyntaxAnalize(contents);
+        llk start = new llk(contents);
+        start.start();
+        //sa.ItsProgram();
         /*
         while(sc.tek_i != contents.length()) {
             int a = sc.scanner(contents, sc.tek_i);

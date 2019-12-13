@@ -37,4 +37,29 @@ public class Constans {
     static final int ERROR = 100;
     static final int END = 200;
     static final int EMPTY = -1;
+    static final int T_CLASS = 110;
+    static final int T_METHOD = 115;
+    static final int T_DATA = 120;
+    static final int T_WHILE = 125;
+    static final int T_RETURN = 130;
+    static final int T_NEW_ID = 135;
+    static final int T_OPISANIE = 140;
+    static final int T_OPERATOR_AND_OPERAND = 145;
+    static final int T_V = 150;
+    static final int T_V1 = 151;
+    static final int T_V2 = 152;
+    static final int T_A = 153;
+    static final int T_A1 = 154;
+    static final int T_ASSIGMENT = 155;
+    static final int T_C = 156;
+    static final int T_C1 = 157;
+    static final int T_F = 158;
+    static final int T_W = 159;
+    static final int T_SPISOK = 160;
+    static final int T_NAME = 161;
+    static final int T_NAME2 = 162;
+    static final int T_TYPE = 163;
+
+    static final int T_ASSIGN = 165;
+
 }

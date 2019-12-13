@@ -529,11 +529,14 @@ public class SyntaxAnalize {
                             getNextLex();
                             if (ItsOperatorAndOperands() == OK) {
                             }
+                            if(tec_iterat == RETURN){
+                                ItsReturn();
+                            }
                             if (tec_iterat == CURLY_BRACE_CLOSE) {
                                 TREE = TREE.SetCur();
                                 getNextLex();
                                 return OK;
-                            } else
+                            }else
                                 printError("Ожидалась } в строке ");
                         } else
                             printError("Ожидалась ){ в строке ");
@@ -690,14 +693,8 @@ public class SyntaxAnalize {
     public int ItsV2() {
         if (tec_iterat == MORE || tec_iterat == MORE_EQUAL || tec_iterat == LESS
                 || tec_iterat == LESS_EQUAL) {
-            if (Type_lex == WHILE) {
-                getNextLex();
-                return OK;
-            } else {
-                printError(">, >=, <, <= только для цикла while. Строка ");
-                return ERROR;
-            }
-
+            getNextLex();
+            return OK;
         } else
             return ItsV3();
     }
