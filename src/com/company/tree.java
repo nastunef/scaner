@@ -1,26 +1,82 @@
 package com.company;
 
-import com.company.Constans;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Set;
 
-enum DATA_TYPE {TYPE_UNIKNOW, TYPE_INTEGER, TYPE_DOUBLE, TYPE_METHOD, TYPE_CLASS, TYPE_PEREMEN, TYPE_WHILE}
+import static com.company.Constans.*;
+
+enum DATA_TYPE {TYPE_UNIKNOW, TYPE_METHOD, TYPE_CLASS, TYPE_PEREMEN, TYPE_OBJECT_CLASS}
 
 class Node {
-    int LexType;// тип лексемы
+
+    int LexType;// тип лексемы(int double)
     String IdClassLex; //идентификатор класса, к которому принадлежит лексема
     DATA_TYPE TypeOfLex;   // вид лексемы-конструкции
-    String NameLex;//имя лексемы - идентификатора
+    String NameLex;//имя лексемы - идентификатор
 
-    Node() { }
+    ValueType valueT; // значение переменной
+
+    public ValueType getValueT() {
+        return valueT;
+    }
+
+    public void setValueT(ValueType valueT) {
+        this.valueT = valueT;
+    }
+    public void setIntInInt(int value){
+        ValueType newValue = new ValueType();
+        newValue.setValue(value);
+        setValueT(newValue);
+    }
+    public void setIntInDouble(int value){
+        ValueType newValue = new ValueType();
+        double doubleValue = (double)value;
+        newValue.setValue(doubleValue);
+        setValueT(newValue);
+    }
+    public void setDoubleInDouble(double value){
+        ValueType newValue = new ValueType();
+        newValue.setValue(value);
+        setValueT(newValue);
+    }
+    public void setDoubleInInt(int value){
+        ValueType newValue = new ValueType();
+        double intValue = (int)value;
+        newValue.setValue(intValue);
+        setValueT(newValue);
+    }
+
+
+    Node() {
+        valueT = new ValueType();
+    }
 
     Node(int LT, DATA_TYPE ToL, String IC, String NL) {
         LexType = LT;
         TypeOfLex = ToL;
         IdClassLex = IC;
         NameLex = NL;
+        valueT = new ValueType();
     }
+
+    Node(int LT, DATA_TYPE ToL, String IC, String NL, double newValue) {
+        LexType = LT;
+        TypeOfLex = ToL;
+        IdClassLex = IC;
+        NameLex = NL;
+        valueT = new ValueType();
+        valueT.setValue(newValue);
+    }
+
+    Node(int LT, DATA_TYPE ToL, String IC, String NL, int newValue) {
+        LexType = LT;
+        TypeOfLex = ToL;
+        IdClassLex = IC;
+        NameLex = NL;
+        valueT = new ValueType();
+        valueT.setValue(newValue);
+    }
+
 
     Node copy() {
         return new Node(LexType, TypeOfLex, IdClassLex, NameLex);
@@ -31,7 +87,7 @@ public class tree {
 
     Node n;
     tree Up, Left, Right;
-    int index_s;
+
 
     tree(tree l, tree r, tree u, Node data) {
 
@@ -42,16 +98,23 @@ public class tree {
     }
 
     tree() {
-        index_s = 0;
         n = new Node();
         Up = null;
         Left = null;
         Right = null;
-        n = new Node();
     }
 
     public static tree Cur;
     public static LinkedList<tree> v = new LinkedList<>();
+
+    public void Pr() {
+        System.out.println("Печать всего");
+        tree begin = Cur;
+        while (begin.Up != null) {
+            begin = begin.Up;
+        }
+        begin.Print();
+    }
 
     // ФУНКЦИИ ОБРАБОТКИ БИНАРНОГО ДЕРЕВА
     public void setLeft(Node Data) {
@@ -68,17 +131,8 @@ public class tree {
     tree FindUp(tree From, String nameLex) {
         //Поиск данных в дереве до его корня вверх по связям
         tree i = From;
-        while ((i != null) && (!nameLex.equals(i.n.NameLex))){
+        while ((i != null) && (!nameLex.equals(i.n.NameLex))) {
             i = i.Up;
-        }
-        return i;
-    }
-
-    tree FindRigthLeft(tree From, int TypeLexId) {
-        // поиск прямых потомков заданной вершины From
-        tree i = From.Right; // текущая вершина поиска
-        while ((i != null) && (TypeLexId != i.n.LexType)) {
-            i = i.Left;
         }
         return i;
     }
@@ -93,9 +147,11 @@ public class tree {
         }
         return null;
     }
-    tree FindInMethod(tree From, String nameLex, DATA_TYPE typeOfLex){
+
+    tree FindInClass(tree From, String nameLex, DATA_TYPE typeOfLex) {
         tree i = From;
-        while((i!=null) && i.n.TypeOfLex != DATA_TYPE.TYPE_METHOD){
+        String nameClass = i.n.IdClassLex;
+        while ((i != null) && i.n.IdClassLex.equals(nameClass)) {
             if (nameLex.equals(i.n.NameLex) && i.n.TypeOfLex == typeOfLex) {
                 return i;
             }
@@ -103,52 +159,25 @@ public class tree {
         }
         return null;
     }
-    tree FindInClass(tree From, String nameLex, DATA_TYPE typeOfLex){
-        tree i = From;
-        String nameClass = i.n.IdClassLex;
-        while((i!=null) &&  i.n.IdClassLex.equals(nameClass)){
-            if (nameLex.equals(i.n.NameLex ) && i.n.TypeOfLex == typeOfLex ) {
-                return i;
-            }
-            i = i.Up;
-        }
-        return null;
 
-    }
-
-
-    tree FindUpTwoLevel(tree From, String nameLex, DATA_TYPE typeOfLex){
-        tree i = From;
-        while ((i != null) && (i.Up.Right != i)) {
-            if (nameLex.equals(i.n.NameLex) && typeOfLex == i.n.TypeOfLex) {
-                return i;
-            }
-            i = i.Up;
-        }
-        if (i != null) {
-            while ((i != null) && (i.Up.Right != i)) {
-                if (nameLex.equals(i.n.NameLex) && typeOfLex == i.n.TypeOfLex) {
-                    return i;
-                }
-                i = i.Up;
-            }
-        }
-        return null;
-    }
-    tree goUp(tree From){
+    tree goUp(tree From) {
         tree v = From;
-        while(v!=v.Up.Right && v!=null){
+        while (v != v.Up.Right && v != null) {
             v.Print();
             v = v.Up;
         }
         Cur = v.Up;
         return v.Up;
     }
+
     void Print() {
         //Отладка
-        System.out.println("Вершина с данными %s ----->" + n.NameLex);
-        if (Left != null) System.out.println("слева данные %s" + Left.n.NameLex);
-        if (Right != null) System.out.println("справа данные %s" + Right.n.NameLex);
+
+        System.out.println("Вершина с данными: " + n.NameLex);
+        System.out.println("Значение: "+ n.getValueT());
+        System.out.println("Тип данных: " + n.LexType);
+        if (Left != null) System.out.println("слева данные " + Left.n.NameLex);
+        if (Right != null) System.out.println("справа данные " + Right.n.NameLex);
         System.out.println("\n");
         if (Left != null) Left.Print();
         if (Right != null) Right.Print();
@@ -163,23 +192,28 @@ public class tree {
         // установить текущий узел дерева
         Cur = v.getLast();
         v.removeLast();
+        /*if (Cur.n.TypeOfLex == DATA_TYPE.TYPE_UNIKNOW) {
+            return Cur.Up;
+        }*/
         return Cur;
     }
 
-    tree GetCur() {
-        // получить значение текущего узла дерева
+    public tree CurUp() {
+        Cur = Cur.Up;
         return Cur;
     }
-    tree addWhile(String IdClass){
-        Node b = new Node(Constans.WHILE, DATA_TYPE.TYPE_WHILE, IdClass, "");
 
+    tree addWhile(String IdClass) {
+        Node b = new Node(Constans.TYPE_UNIKNOW, DATA_TYPE.TYPE_UNIKNOW, IdClass, "");
         return addMethodOrClass(b);
     }
-    tree addClassMain(){
-        Node main = new Node(Constans.CLASS,DATA_TYPE.TYPE_CLASS,"Main","Main");
+
+    tree addClassMain() {
+        Node main = new Node(Constans.CLASS, DATA_TYPE.TYPE_CLASS, "Main", "Main");
         Cur = new tree();
         return addMethodOrClass(main);
     }
+
     tree addMethodOrClass(Node b) {
 
         Cur.setLeft(b);
@@ -188,9 +222,9 @@ public class tree {
         // это точка возврата после выхода из метода/класса
         v.addLast(Cur);
         String nameClass;
-        if(b.TypeOfLex == DATA_TYPE.TYPE_CLASS) {
+        if (b.TypeOfLex == DATA_TYPE.TYPE_CLASS) {
             nameClass = b.NameLex;
-        }else {
+        } else {
             nameClass = b.IdClassLex;
         }
         Node c = new Node(Constans.EMPTY, DATA_TYPE.TYPE_UNIKNOW, nameClass, "");
@@ -206,21 +240,34 @@ public class tree {
         Cur = Cur.Left;
         return Cur;
     }
+    private tree cloneBrunch(Node b, tree copy) {
+
+        Cur.setLeft(b);
+        // сделали вершину - объект класса
+        Cur = Cur.Left;
+        // это точка возврата после выхода из метода/класса
+        v.addLast(Cur);
+        copy.Up = Cur;
+        Cur.Right = copy;
+        SetCur();
+
+        return v.getLast();
+    }
 
     tree SemInclude(int TypeLexA, DATA_TYPE t, String IdClass, String nameLex) {
         // занесение идентификатора a в таблицу с типом t
         //если нашли уже в дереве
 
-        if(t == DATA_TYPE.TYPE_CLASS){
-            if(Cur == null){
+        if (t == DATA_TYPE.TYPE_CLASS) {
+            if (Cur == null) {
                 Cur = new tree();
             }
-            if(FindUp(Cur,nameLex) == null){ }
-            else {
+            if (FindUp(Cur, nameLex) == null) {
+            } else {
                 PrintError("Повторное описание класса", nameLex);
                 return null;
             }
-        }else {
+        } else {
             if (DupControl(Cur, nameLex, t) == 1) {
                 PrintError("Повторное описание идентификатора ", nameLex);
                 return null;
@@ -228,71 +275,68 @@ public class tree {
         }
 
         Node b = new Node(TypeLexA, t, IdClass, nameLex);
-        if (t == DATA_TYPE.TYPE_PEREMEN) {
+
+        if (TypeLexA == OBJECT_CLASS) {
+            b = new Node(TypeLexA,DATA_TYPE.TYPE_OBJECT_CLASS,IdClass,nameLex);
+            return addObjectClass(b);
+        } else if (t == DATA_TYPE.TYPE_PEREMEN) {
             return addPeremen(b);
-        } else{
+
+        } else {
             return addMethodOrClass(b);
         }
     }
 
-    void SemSetType(tree Addr, DATA_TYPE t) {
-        // установить тип t для переменной по адресу Addr
-        Addr.n.TypeOfLex = t;
-    }
-
-    tree SemGetType(String NameLex) {
-        // найти в таблице переменную с именем TypeLexA
-        // и вернуть ссылку на соответствующий элемент дерева
-        tree v = FindUp(Cur, NameLex);
-        if (v == null) {
-            PrintError("Отсутствует описание идентификатора ", NameLex);
+    private tree addObjectClass(Node b) {
+        tree copy = cloneBrunchClass(b.IdClassLex);
+        if (copy == null) {
+            PrintError("Класс не сущестсвует", b.IdClassLex);
+            return null;
         }
-        if (v.n.TypeOfLex == DATA_TYPE.TYPE_DOUBLE || v.n.TypeOfLex == DATA_TYPE.TYPE_INTEGER) {
-            PrintError("Неверное использование вызова метода ", NameLex);
-        }
-        return v;
-    }
-
-    DATA_TYPE typeLex(String NameLex) {
-        tree search = SemGetType(NameLex);
-        if (search != null)
-            return search.n.TypeOfLex;
-        else
-            return DATA_TYPE.TYPE_UNIKNOW;
+        return cloneBrunch(b, copy);
     }
 
 
-    tree SemGetMethod(String NameLex) {
-        // найти в таблице метод с именем TypeLexA
-        // и вернуть ссылку на соответствующий элемент дерева
-        tree v = FindUp(Cur, NameLex);
-        if (v == null) {
-            PrintError("Отсутствует описание функции ", NameLex);
+
+    private tree cloneBrunchClass(String idClassLex) {
+        tree findClass = SemGetClass(idClassLex);
+        if (findClass != null && findClass.Right != null) {
+            tree copyTree = new tree();
+            copyTree = copyWithParent(findClass.Right, copyTree);
+            return copyTree;
         }
-        if (v.n.TypeOfLex != DATA_TYPE.TYPE_METHOD) {
-           return null;
-        }
-        return v;
+        return null;
     }
+
+    public tree copyWithParent(tree parentOverride, tree newTree) {
+        Node out = new Node(parentOverride.n.LexType, parentOverride.n.TypeOfLex, parentOverride.n.IdClassLex,
+                parentOverride.n.NameLex);
+        newTree.n = out;
+        newTree.Left = new tree();
+        if (parentOverride.Left != null) {
+            newTree.Left = copyWithParent(parentOverride.Left, newTree.Left);
+        }
+        return newTree;
+    }
+
     tree SemGetClass(String NameLex) {
         // найти в таблице класс с именем TypeLexA
         // и вернуть ссылку на соответствующий элемент дерева
-        tree v = FindUpOneLevel(Cur, NameLex,DATA_TYPE.TYPE_CLASS);
+        tree v = FindUpOneLevel(Cur, NameLex, DATA_TYPE.TYPE_CLASS);
         if (v == null) {
             PrintError("Отсутствует описание класса ", NameLex);
-        }else
-            if (v.n.TypeOfLex != DATA_TYPE.TYPE_CLASS) {
-               return null;
-            }
+        } else if (v.n.TypeOfLex != DATA_TYPE.TYPE_CLASS) {
+            return null;
+        }
         return v;
     }
-    tree GetClass(tree From,String nameClass){
+
+    tree GetClass(tree From, String nameClass) {
         tree Search = FindUp(From, nameClass);
-        if(Search != null){
+        if (Search != null) {
             return Search.Right;
         }
         return null;
-
     }
 
     int DupControl(tree Addr, String nameLex, DATA_TYPE t) {
@@ -301,8 +345,5 @@ public class tree {
         return 1;
     }
 
-    void exitMetodOrClass() {
-        index_s--;
-    }
 
 }

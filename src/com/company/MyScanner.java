@@ -7,6 +7,7 @@ public class MyScanner {
     public int tek_i;
     public int str;
     public String nameId;
+    public String number;
     public int MAXLEX = 15;
 
     public MyScanner() {
@@ -122,10 +123,10 @@ public class MyScanner {
 
     public boolean it_is_id(String lex, int i) {
         int j =0;
-        char NameId[] = new char[MAXLEX];
+        String NameId ="";
         String s;
         while (HexLetter(lex.charAt(i)) || lex.charAt(i) == '_' || Num(lex.charAt(i))) {
-            NameId[j] = lex.charAt(i);;
+            NameId += lex.charAt(i);
             j++;
             if (i + 1 == lex.length()) {
                 tek_i = i + 1;
@@ -148,15 +149,18 @@ public class MyScanner {
                 tek_i = i + 1;
                 return false;
             }
+            number+=lex.charAt(i);
             i++;
         }
         if (lex.charAt(i) == 'e') {
+            number+=lex.charAt(i);
             if (i + 1 == lex.length()) {
                 tek_i = i + 1;
                 return true;
             }
             i++;
             if (lex.charAt(i) == '-' || lex.charAt(i) == '+') {
+                number+=lex.charAt(i);
                 if (i + 1 == lex.length()) {
                     tek_i = i;
                     return true;
@@ -164,6 +168,7 @@ public class MyScanner {
                 i++;
             }
             while (Num(lex.charAt(i))) {
+                number+=lex.charAt(i);
                 if (i + 1 == lex.length()) {
                     tek_i = i + 1;
                     return true;
@@ -173,7 +178,7 @@ public class MyScanner {
             if (HexLetter(lex.charAt(i))) {
                 return false;
             } else {
-                tek_i = i + 1;
+                tek_i = i;
                 return true;
             }
         } else return false;
@@ -252,14 +257,17 @@ public class MyScanner {
             }
 
         } else if (Num(lex.charAt(i))) {
+             number ="";
             while (Num(lex.charAt(i))) {
                 if (i + 1 == lex.length()) {
                     tek_i = i + 1;
                     return TYPE_IN;
                 }
+                number+=lex.charAt(i);
                 i++;
             }
             if (lex.charAt(i) == '.') {
+                number+=lex.charAt(i);
                 i++;
                 if (it_is_double_ex(lex, i)) {
                     return TYPE_DOUBL;

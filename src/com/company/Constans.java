@@ -4,6 +4,7 @@ public class Constans {
 
     static int TYPE_IN = 1;
     static final int TYPE_DOUBL = 2;
+    static final int TYPE_UNIKNOW = -2;
     static final int INT = 11;
     static final int DOUBLE = 12;
     static final int WHILE = 13;
@@ -32,6 +33,7 @@ public class Constans {
     static final int CURLY_BRACE_CLOSE = 41;
     static final int COMMA = 42;
     static final int VIRGULE = 45;
+    static final int OBJECT_CLASS = 46;
     static final int OK = 90;
     static final int NEXT = 95;
     static final int ERROR = 100;

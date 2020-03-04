@@ -1,33 +1,36 @@
 class main {
 
     int Main(){
-        int fileName;
-        double der;
+    int aa = 3/2+2.5e0;
+    double bb = 3/2 +2.5e0;
+    bb = 3;
+    bb= bb/2 + 2.5e0;
+    int a = 2 + 1 + 3 + 5 - 3 + 5*10 + (10+2);
+        int fileName = 1 - 2.5e-2;
         int lel = fileName;
-        return 1;
+        return lel;
     }
     class pop{
         int a1, xx,yy,zz;
         int b;
         int c;
         int b(){
-            int a;
+            double a = 2.5e-2*3/2;
             int a1, xx,yy,zz;
-            int g = a;
+            double g ;
             double r;
             while(a >= g){
-                int l = g + 2 + 4 * c + (4);
                 return a;
             }
-            int l = g + 2 + 4;
+            int l = g;
             int k = l;
-        return 1;
+        return k;
         }
-        int a = new pop();
+
         int k;
      }
+
      pop a = new pop();
-     pop b = new pop();
-     int l = a.b() + (1 +2);
+     pop e = new pop();
 
 }

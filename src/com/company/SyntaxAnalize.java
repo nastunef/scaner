@@ -2,9 +2,6 @@ package com.company;
 
 
 import java.util.ArrayList;
-import java.util.Queue;
-
-import com.company.MyScanner;
 
 import static com.company.Constans.*;
 
@@ -29,15 +26,33 @@ public class SyntaxAnalize {
     public String IdClass[] = new String[5];
     //дерево для поиска
     private tree treeForSearch;
-    private  boolean roundBrace;
+    private boolean roundBrace;
+    private int flInt;
 
+    private  ValueType expressionV;
+    private int valueType;
 
+    private double sumD;
+    private int sumI;
+
+    private int typeEp;
+    private boolean beginExp;
+
+    private void initExp(){
+        expressionV = new ValueType();
+        sumD =0;
+        sumI = 0;
+        treeForSearch = null;
+        typeEp = TYPE_IN;
+        beginExp = true;
+    }
     SyntaxAnalize(String newContent) {
         tec_iterat = 0;
         content = newContent;
         sc = new MyScanner();
         iForClass = 0;
         itsWhile = false;
+        flInt = 1;
 
     }
 
@@ -60,9 +75,11 @@ public class SyntaxAnalize {
             if (tec_iterat == MAIN) {
                 //добавили маин в дерево
                 IdClass[iForClass] = "Main";
-                TREE = TREE.addClassMain();
-                if (TREE == null) {
-                    return ERROR;
+                if(flInt == 1) {
+                    TREE = TREE.addClassMain();
+                    if (TREE == null) {
+                        return ERROR;
+                    }
                 }
                 getNextLex();
                 while (true) {
@@ -92,12 +109,16 @@ public class SyntaxAnalize {
             if (tec_iterat == ID) {
 
                 //проверка на существование класса, если нет то внести в дерево
-                TREE = TREE.SemInclude(CLASS, com.company.DATA_TYPE.TYPE_CLASS, IdClass[iForClass], sc.nameId);
-                iForClass++;
-                if (TREE == null) {
-                    return ERROR;
+                if(flInt == 1) {
+                    TREE = TREE.SemInclude(CLASS, com.company.DATA_TYPE.TYPE_CLASS, IdClass[iForClass], sc.nameId);
+                    iForClass++;
+
+
+                    if (TREE == null) {
+                        return ERROR;
+                    }
+                    IdClass[iForClass] = sc.nameId;
                 }
-                IdClass[iForClass] = sc.nameId;
                 getNextLex();
                 int a = ItsDescriptions();
                 if (a == END) {
@@ -127,7 +148,9 @@ public class SyntaxAnalize {
                 } else return ERROR;
             }
             if (tec_iterat == CURLY_BRACE_CLOSE) {
-                TREE = TREE.SetCur();
+                if(flInt == 1) {
+                    TREE = TREE.SetCur();
+                }
                 getNextLex();
                 return END;//END
             } else {
@@ -143,7 +166,13 @@ public class SyntaxAnalize {
             Type_lex = tec_iterat;
             if (tec_iterat == ID) {
                 nameClass = sc.nameId;
-                Type_lex = CLASS;
+                Type_lex = OBJECT_CLASS;
+            }
+            else if(tec_iterat == INT){
+                nameClass = "int";
+            }
+            else {
+                nameClass = "double";
             }
             getNextLex();
             return OK;
@@ -186,25 +215,30 @@ public class SyntaxAnalize {
         if (tec_iterat == ROUND_BRACE_OPEN) {
             getNextLex();
             if (tec_iterat == ROUND_BRACE_CLOSE) {
-                //проверка на существование функции, если существует, то ошибка если нет то внести!
-                TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_METHOD, IdClass[iForClass], sc.nameId);
-                if (TREE == null) {
-                    return ERROR;
+                if(flInt == 1) {
+                    //проверка на существование функции, если существует, то ошибка если нет то внести!
+                    TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_METHOD, IdClass[iForClass], sc.nameId);
+                    if (TREE == null) {
+                        return ERROR;
+                    }
+
                 }
+
                 getNextLex();
                 if (tec_iterat == CURLY_BRACE_OPEN) {
                     Type_method = Type_lex;
                     getNextLex();
                     if (ItsOperatorAndOperands() == OK) {
-                        if(tec_iterat == RETURN){
+                        if (tec_iterat == RETURN) {
                             ItsReturn();
-                        }
-                        else {
+                        } else {
                             printError("Ожилася return в строке ");
                         }
                         if (tec_iterat == CURLY_BRACE_CLOSE) {
-                            TREE = TREE.SetCur();
-                            Type_method = 0;
+                            if(flInt == 1) {
+                                TREE = TREE.SetCur();
+                                Type_method = 0;
+                            }
                             getNextLex();
                             return OK;
                         } else {
@@ -231,36 +265,49 @@ public class SyntaxAnalize {
             getNextLex();
         }
         if (tec_iterat == VIRGULE) {
-            TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
-            if (TREE == null) {
-                return ERROR;
+            if(flInt == 1) {
+                TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
+
+                if (TREE == null) {
+                    return ERROR;
+                }
             }
+
             getNextLex();
             return ItsID();
         }
         if (tec_iterat == COMMA) {
-            TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
-            if (TREE == null) {
-                return ERROR;
+            if(flInt == 1) {
+                TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
+
+                if (TREE == null) {
+                    return ERROR;
+                }
             }
             getNextLex();
             return OK;
         } else if (tec_iterat == ASSIGN) {
-            TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
-            if (TREE == null) {
-                return ERROR;
+            if(flInt == 1) {
+                TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
+                if (TREE == null) {
+                    return ERROR;
+                }
             }
+
             getNextLex();
             int newClass = ItsExempleClass();
             if (newClass == OK) {
             } else if (newClass == ERROR) {
                 return ERROR;
             } else {
-                int ItsV1 = ItsV1();
-                if (ItsV1 == OK) {
+                Node val = new Node();
+                val.valueT.setValue(0);
+                int ItsV1 = expression1(val);
+                addValue(TREE, val);
+              /*  if (ItsV1 == OK) {
                 } else if (ItsV1 == ERROR) {
                     return ERROR;
-                }
+                }*/
             }
             if (tec_iterat == COMMA) {
                 getNextLex();
@@ -275,24 +322,7 @@ public class SyntaxAnalize {
 
     }
 
-   /* public int ItsData() {
-        int a = ItsList();
-        if (a == OK) {
-            if (tec_iterat == COMMA) {
-                getNextLex();
-                return OK;
-            } else if (tec_iterat == ROUND_BRACE_OPEN) {
-                return NEXT;
-            } else if (tec_iterat == ASSIGN) {
-                return NEXT;
-            } else return ERROR;
-        } else if (a == ERROR)
-            return ERROR;
-        else
-            return NEXT;
-    }*/
-
-    public int ItsNameN() {
+    public int ItsNameN(Node val) {
         //ПРОВЕРКА НА СУЩЕСТВОВАНИЕ ПЕРЕМЕННОЙ
         //перед входом в эту функцию обнулить глобаньную
         //найти в дереве(это может быть функцией)
@@ -301,83 +331,102 @@ public class SyntaxAnalize {
         }
 
         if (tec_iterat == ID) {
-            tree searchNode;
-
-            searchNode = treeForSearch.FindInClass(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN);
+            tree searchNode = null;
+            if(flInt == 1) {
+                searchNode = treeForSearch.FindInClass(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN);
+                if(searchNode.n.valueT.getValue() != null) {
+                    val.valueT.setValue(searchNode.n.valueT.getValue());
+                    val.LexType = searchNode.n.LexType;
+                }
+                else {
+                    printError("Переменная не инциализирована. Строка ");
+                    val.valueT.setValue(null);
+                    val.LexType = TYPE_UNIKNOW;
+                }
+            }
             getNextLex();
 
-            if (searchNode != null && searchNode.n.LexType == CLASS) {
+            if ((searchNode != null && searchNode.n.LexType == CLASS && flInt == 1) || flInt == 0) {
                 if (tec_iterat == DOT) {
                     getNextLex();
                     if (tec_iterat != ID) {
                         printError("После точки ожидалось продолжение. Строка ");
                         return ERROR;
                     } else {
-                        treeForSearch = TREE.GetClass(TREE,searchNode.n.IdClassLex);
-                        while (treeForSearch.Left != null) {
-                            treeForSearch = treeForSearch.Left;
+                        if(flInt == 1) {
+                            treeForSearch = TREE.GetClass(TREE, searchNode.n.IdClassLex);
+                            while (treeForSearch.Left != null) {
+                                treeForSearch = treeForSearch.Left;
+                            }
                         }
-                        return ItsNameN();
+                        return ItsNameN(val);
                     }
-                } else {
+                } else if(flInt == 1){
                     printError("Переменную класса нельзя присвоить. Строка ");
                     return ERROR;
                 }
-
             }
-            if(tec_iterat != ROUND_BRACE_OPEN) {
+            if (tec_iterat != ROUND_BRACE_OPEN) {
                 //searchNode = treeForSearch.FindUpOneLevel(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN);
-                if (searchNode != null) {
+                if ((searchNode != null && flInt == 1) || flInt == 0) {
                     if (tec_iterat == DOT) {
-                        printError(sc.nameId.toString() + " это переменная, послне нее не должно быть точки. Строка ");
+                        printError(sc.nameId + " это переменная, послне нее не должно быть точки. Строка ");
                         return ERROR;
                     } else if (tec_iterat != CURLY_BRACE_OPEN) {
-                        if (Type_lex == WHILE) {
-                            Type_lex = searchNode.n.LexType;
+                        if(flInt == 1) {
+                            if (Type_lex == WHILE) {
+                                Type_lex = searchNode.n.LexType;
+                            }
                         }
-                        if (searchNode.n.LexType == Type_lex) {
-                            if(tec_iterat == ROUND_BRACE_CLOSE && roundBrace){
+                        if ((searchNode != null && searchNode.n.LexType == Type_lex) || flInt == 0) {
+                            if (tec_iterat == ROUND_BRACE_CLOSE && roundBrace) {
                                 getNextLex();
                                 roundBrace = false;
                             }
                             return OK;
                         } else {
-                            printError("Несоответствие типов в строке ");
+                            printError("1Несоответствие типов в строке ");
                             return ERROR;
                         }
                     }
                 }
             }
-            searchNode = treeForSearch.FindInClass(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_METHOD);
-            if (searchNode != null) {
+            if(flInt == 1) {
+                searchNode = treeForSearch.FindInClass(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_METHOD);
+            }
+            if ((searchNode != null && flInt == 1) || flInt == 0 ) {
                 if (tec_iterat == DOT) {
-                    printError(sc.nameId.toString() + " это метод, после метода не должно быть точки. Строка ");
+                    printError(sc.nameId + " это метод, после метода не должно быть точки. Строка ");
                     return ERROR;
                 } else if (tec_iterat == ROUND_BRACE_OPEN) {
                     getNextLex();
                     if (tec_iterat == ROUND_BRACE_CLOSE) {
                         getNextLex();
-                        if (Type_lex == WHILE) {
-                            Type_lex = searchNode.n.LexType;
-                        } else if (Type_lex == searchNode.n.LexType) {
-                            if(tec_iterat == ROUND_BRACE_CLOSE && roundBrace){
-                                getNextLex();
-                                roundBrace = false;
+                        if (flInt == 1) {
+                            if (Type_lex == WHILE) {
+                                Type_lex = searchNode.n.LexType;
+                            } else if (Type_lex == searchNode.n.LexType) {
+                                if (tec_iterat == ROUND_BRACE_CLOSE && roundBrace) {
+                                    getNextLex();
+                                    roundBrace = false;
+                                }
+                                return OK;
+                            } else {
+                                    printError("2Несоответствие типов в строке ");
+                                    return ERROR;
                             }
-                            return OK;
                         } else {
-                            printError("Несоответствие типов в строке ");
-                            return ERROR;
+                            if (tec_iterat == ROUND_BRACE_CLOSE) {
+                                getNextLex();
+                                return OK;
+                            } else {
+                                printError("Ожидалась ). Строка ");
+                                return ERROR;
+                            }
                         }
-                    } else {
-                        printError("Ожидалась ). Строка ");
-                        return ERROR;
                     }
-                } else {
-                    printError("Ожидалось (. Строка ");
-                    return ERROR;
                 }
-            } else {
+            }else {
                 printError("Неопределенная переменная. Строка " + sc.nameId);
                 return ERROR;
             }
@@ -385,32 +434,18 @@ public class SyntaxAnalize {
         return NEXT;
     }
 
-    public int ItsName() {
-        //ПРОВЕРКА НА СУЩЕСТВОВАНИЕ ПЕРЕМЕННОЙ
-        //перед входом в эту функцию обнулить глобаньную
-        if (tec_iterat == ID) {
-            tree searchNode = TREE.FindUpOneLevel(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_CLASS);
-            //найти в дереве(это может быть функцией)
-            getNextLex();
-            if (tec_iterat == DOT && searchNode.n.LexType == CLASS) {
-                //проверить есть ли ответвление вправо если нет, то ошибка, если нет то запомнить в глобальной ответвление
-                getNextLex();
-                if (ItsName() == OK) {
-
-                    return OK;
-                } else {
-                    printError("Ожидался идентификатор после точки в строке ");
-                    return ERROR;
-                }
-            }
-            return OK;
-        }
-        return ERROR;
-    }
-
     public int ItsOperatorAndOperands() {
         while (tec_iterat != CURLY_BRACE_CLOSE && tec_iterat != RETURN) {
-            if (ItsTypeData() == OK) {
+
+            int itsOperator = ItsOperator();
+            if (itsOperator == OK) {
+            } else if (itsOperator == ERROR) {
+                return ERROR;
+            } else if (tec_iterat == CLASS) {
+                getNextLex();
+                printError("Описание класса недопустимо! в строке");
+                return ERROR;
+            } else if (ItsTypeData() == OK) {
                 int a = ItsID();
                 if (a == OK) {
 
@@ -421,19 +456,10 @@ public class SyntaxAnalize {
                     printError("Описание метода неуместно. Строка ");
                     return ERROR;
                 }
-            } else {
-                int itsOperator = ItsOperator();
-                if (itsOperator == OK) {
-                } else if (itsOperator == ERROR) {
-                    return ERROR;
-                } else if (tec_iterat == CLASS) {
-                    getNextLex();
-                    printError("Описание класса недопустимо! в строке");
-                    return ERROR;
-                }
             }
         }
-        return OK;
+            return OK;
+
     }
 
     public int ItsOperator() {
@@ -451,15 +477,21 @@ public class SyntaxAnalize {
             } else {
                 if (tec_iterat == ID) {
                     //проверка существования переменной
-                    tree Search;
-                    if ((Search = TREE.FindInClass(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN)) == null) {
-                        printError("Переменная не объявлена. Строка ");
-                        return ERROR;
+                    tree Search = null;
+                    if(flInt == 1) {
+                        if ((Search = TREE.FindInClass(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN)) == null) {
+                            printError("Переменная не объявлена. Строка ");
+                            return ERROR;
+                        }
                     }
                     getNextLex();
-                    Type_lex = Search.n.LexType;
-                    a = ItsAssignment();
+                    if (Search != null) {
+                        Type_lex = Search.n.LexType;
+                    }
+                    Node val = new Node();
+                    a = ItsAssignment(val);
                     if (a == OK) {
+                        addValue(Search,val);
                         return OK;
                     }
                 } else if (a == ERROR) {
@@ -477,6 +509,26 @@ public class SyntaxAnalize {
         return NEXT;
     }
 
+    private void addValue(tree search, Node val) {
+        if(val.LexType == search.n.LexType) {
+            TREE.n.valueT.setValue(val.valueT.getValue());
+        }else if(search.n.LexType == DOUBLE && val.LexType == INT){
+            System.out.println(val.valueT.getValue());
+            double res = Double.valueOf((int)val.valueT.getValue());
+            TREE.n.valueT.setValue(res);
+        } else if(search.n.LexType == INT && val.LexType == DOUBLE){
+            double res = (double)val.valueT.getValue();
+            int res1 = (int)res;
+            TREE.n.valueT.setValue(res1);
+        }
+        else if(val.LexType == TYPE_UNIKNOW) {
+            //printError("");
+        }else{
+            printError("Несоответсвие типов в строке ");
+        }
+        search.Print();
+    }
+
     public int ItsReturn() {
         if (tec_iterat == RETURN) {
             //вернуть тип перменной метода
@@ -486,7 +538,8 @@ public class SyntaxAnalize {
             }
             Type_lex = Type_method;
             getNextLex();
-            if (ItsV1() == OK) {
+            Node val = new Node();
+            if (expression1(val) == OK) {
                 if (tec_iterat == COMMA) {
                     getNextLex();
                     return OK;
@@ -500,7 +553,9 @@ public class SyntaxAnalize {
 
     public int ItsBreak() {
         if (tec_iterat == BREAK) {
-            TREE = TREE.goUp(TREE);
+            if(flInt == 1) {
+                TREE = TREE.goUp(TREE);
+            }
             getNextLex();
             if (tec_iterat == COMMA) {
                 getNextLex();
@@ -514,29 +569,81 @@ public class SyntaxAnalize {
     public int ItsWhile() {
         if (tec_iterat == WHILE) {
             Type_lex = WHILE;
-            TREE.addWhile(IdClass[iForClass]);
-            if (TREE == null) {
-                return ERROR;
+            if(flInt == 1) {
+                TREE.addWhile(IdClass[iForClass]);
+                if (TREE == null) {
+                    return ERROR;
+                }
             }
-
             getNextLex();
+
             if (tec_iterat == ROUND_BRACE_OPEN) {
                 getNextLex();
-                if (ItsV1() == OK) {
+
+                //сохраняем указатель в тексте
+                int localFlInt = flInt;
+                start:
+                do {
+
+                    Node val = new Node();
+                    int v = expression1(val);
+                    //вычисляем выражение в скобках
+                    //меняем флаг
+
+
+                    if (flInt == 1 && v == OK) {
+
+                        if (tec_iterat == ROUND_BRACE_CLOSE) {
+                            getNextLex();
+                            if (tec_iterat == CURLY_BRACE_OPEN) {
+                                getNextLex();
+                                if (ItsOperatorAndOperands() == OK) {
+                                }
+                                if (tec_iterat == RETURN) {
+                                    ItsReturn();
+                                }
+                                if (tec_iterat == CURLY_BRACE_CLOSE) {
+                                    if (flInt == 1) {
+                                        TREE = TREE.SetCur();
+                                        TREE = TREE.CurUp();
+                                    }
+                                    getNextLex();
+                                    return OK;
+                                } else
+                                    printError("Ожидалась } в строке ");
+                            } else
+                                printError("Ожидалась ){ в строке ");
+                        } else
+                            printError("Ожидалась ( в строке ");
+                    }else {
+                        break start;
+                    }
+                    //восстанавливаем указатель
+                }while (true);
+                flInt = localFlInt;
+
+
+
+
+                Node val = new Node();
+                if (expression1(val) == OK) {
                     if (tec_iterat == ROUND_BRACE_CLOSE) {
                         getNextLex();
                         if (tec_iterat == CURLY_BRACE_OPEN) {
                             getNextLex();
                             if (ItsOperatorAndOperands() == OK) {
                             }
-                            if(tec_iterat == RETURN){
+                            if (tec_iterat == RETURN) {
                                 ItsReturn();
                             }
                             if (tec_iterat == CURLY_BRACE_CLOSE) {
-                                TREE = TREE.SetCur();
+                                if(flInt == 1) {
+                                    TREE = TREE.SetCur();
+                                    TREE = TREE.CurUp();
+                                }
                                 getNextLex();
                                 return OK;
-                            }else
+                            } else
                                 printError("Ожидалась } в строке ");
                         } else
                             printError("Ожидалась ){ в строке ");
@@ -549,10 +656,10 @@ public class SyntaxAnalize {
         return NEXT;
     }
 
-    public int ItsAssignment() {
+    public int ItsAssignment(Node val) {
         if (tec_iterat == ASSIGN) {
             getNextLex();
-            if (ItsV1() == OK) {
+            if (expression1(val) == OK) {
                 if (tec_iterat == COMMA) {
                     getNextLex();
                     return OK;
@@ -568,71 +675,18 @@ public class SyntaxAnalize {
     }
 
 
-  /*  public int ItsList() {
-        int a = ItsPeremen();
-        if (a == OK) {
-            if (tec_iterat == VIRGULE) {
-                getNextLex();
-                return ItsList();
-            }
-            return OK;
-        } else if (a == ERROR)
-            return ERROR;
-        else return NEXT;
-    }*/
-
-    /*public int ItsPeremen() {
-        if (tec_iterat == ID) {
-            //проверить обявлена ли она(2)OK
-            if (TREE.DupControl(TREE, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN) == 0) {
-                //обьявитьOK
-                TREE = TREE.SemInclude(Type_lex, com.company.DATA_TYPE.TYPE_PEREMEN, IdClass[iForClass], sc.nameId);
-                if (TREE == null) {
-                    return ERROR;
-                }
-            } else {
-                printError("Переменная " + sc.nameId + " уже обьявлена. Строка  ");
-                return ERROR;
-            }
-            getNextLex();
-
-            //если знак =
-            if (tec_iterat == ASSIGN) {
-                getNextLex();
-
-                //проверка на обьявление экземпляра классаOK
-                int a = ItsExempleClass();
-                if (a == OK) {
-                    return OK;
-                } else if (a == ERROR) {
-                    return ERROR;
-                } else {
-                    //проверка на присваивание значения переменнойOK
-                    int b = ItsV1();
-                    //проверить соответсвие типов(3)OK
-                    if (b == OK) {
-                        return OK;
-                    } else if (b == ERROR)
-                        return ERROR;
-                    else return NEXT;
-                }
-            }
-            return OK;
-        } else if (tec_iterat == VIRGULE || tec_iterat == EQUAL || tec_iterat == COMMA)
-            return NEXT;
-        else return ERROR;
-    }*/
-
     public int ItsExempleClass() {
         if (tec_iterat == NEW) {
             //проверить есть ли такой класс(2)OK
-            if (TREE.SemGetClass(nameClass) == null) {
-                printError("Тип данных не определен в строке  ");
-                return ERROR;
+            if(flInt == 1) {
+                if (TREE.SemGetClass(nameClass) == null) {
+                    printError("Тип данных не определен в строке  ");
+                    return ERROR;
+                }
             }
-
             getNextLex();
             if (tec_iterat == ID) {
+
                 //проверить правильный ли ид класса при объялении соответвует ли типу(tec_type == ID)(1)OK
                 if (nameClass.equals(sc.nameId) == false) {
                     printError("Ошибка при объявлении экземпляра класса в строке ");
@@ -662,90 +716,324 @@ public class SyntaxAnalize {
     }
 
 
-    public int ItsV1() {
-        treeForSearch = null;
-        if(tec_iterat == ROUND_BRACE_OPEN){
-            roundBrace = true;
-            getNextLex();
-        }
-        int a = ItsElement();
-        if (a == OK) {
-            if (tec_iterat == EQUAL || tec_iterat == NOT_EQUAL) {
+    public int expression1(Node val){
+       initExp();
+        if(expression2(val)!= ERROR){
+            while (tec_iterat == EQUAL || tec_iterat == NOT_EQUAL){
                 getNextLex();
-
-            } else {
-                int b = ItsV2();
-                if (b == NEXT) {
-                    //если next то значит нужно выйти из функции
-                    return OK;
-                } else if (b == ERROR) {
+                Node val1 = new Node();
+                val1.valueT.setValue(0);
+                if(expression2(val1)== ERROR) {
                     return ERROR;
                 }
+                //не знаю как проверять
             }
-            if (ItsV1() == OK)
-                return OK;
-            else return ERROR;
-        } else if (a == ERROR)
+        }else
             return ERROR;
-        return NEXT;
+        return OK;
+    }
+    public int expression2(Node val){
+        if(expression3(val)!= ERROR){
+            while (tec_iterat == MORE || tec_iterat == MORE_EQUAL ||
+                    tec_iterat == LESS || tec_iterat == LESS_EQUAL){
+                getNextLex();
+                Node val1 = new Node();
+                val1.valueT.setValue(0);
+                if(expression3(val1) == ERROR){
+                    return ERROR;
+                }
+                //хз че делать
+            }
+        }else
+            return ERROR;
+        return OK;
     }
 
-    public int ItsV2() {
-        if (tec_iterat == MORE || tec_iterat == MORE_EQUAL || tec_iterat == LESS
-                || tec_iterat == LESS_EQUAL) {
-            getNextLex();
-            return OK;
-        } else
-            return ItsV3();
+    public int expression3(Node val){
+        if(expression4(val)!= ERROR){
+            while(tec_iterat == PLUS || tec_iterat == MINUS){
+                int operator = tec_iterat;
+                getNextLex();
+                Node val1 = new Node();
+                val1.valueT.setValue(0);
+                if(expression4(val1) == ERROR){
+                    return  ERROR;
+                }
+                if(operation(val,val1,operator) == ERROR){
+                    return ERROR;
+                }
+
+            }
+        }else
+            return ERROR;
+        return OK;
     }
 
-    public int ItsV3() {
-        if (tec_iterat == PLUS || tec_iterat == MINUS) {
-            getNextLex();
-            return OK;
-        } else
-            return ItsV4();
-    }
-
-    public int ItsV4() {
-        if (tec_iterat == STAR || tec_iterat == SLASH) {
-            getNextLex();
-            return OK;
+    public int expression4(Node val){
+        if(ItsElement(val) == ERROR) {
+            return ERROR;
         }
-        return NEXT;
+
+        while (tec_iterat == SLASH || tec_iterat == STAR){
+            int operator = tec_iterat;
+            getNextLex();
+
+            Node val1 = new Node();
+            val1.valueT.setValue(0);
+            if(ItsElement(val1) == ERROR){
+                return ERROR;
+            }
+            if(operation(val,val1,operator) == ERROR){
+                return ERROR;
+            }
+
+        }
+        return OK;
     }
 
-    public int ItsElement() {
+    public int ItsElement(Node val) {
 
-        int itsNameN = ItsNameN();
+        int itsNameN = ItsNameN(val);
         if (itsNameN == OK) {
             return OK;
         } else if (itsNameN == ERROR) {
             return ERROR;
         } else {
-            int a = ItsConstant();
+            int a = ItsConstant(val);
             if (a == OK) {
                 return OK;
-            } else if (a == ERROR)
+            } else if (a == ERROR) {
                 return ERROR;
+            }else {
+                if(tec_iterat == ROUND_BRACE_OPEN){
+                    getNextLex();
+                    if(expression1(val)==ERROR){
+                        return ERROR;
+                    }
+                    if(tec_iterat == ROUND_BRACE_CLOSE){
+                        getNextLex();
+                    }
+                    return OK;
+                }
+            }
         }
         return NEXT;
     }
 
-    public int ItsConstant() {
+    public int ItsConstant(Node val) {
         if (tec_iterat == TYPE_IN || tec_iterat == TYPE_DOUBL) {
-            if ((tec_iterat == TYPE_IN && Type_lex == INT) || (tec_iterat == TYPE_DOUBL && Type_lex == DOUBLE)) {
-                getNextLex();
-                if(tec_iterat == ROUND_BRACE_CLOSE && roundBrace){
-                    getNextLex();
-                    roundBrace = false;
-                }
-                return OK;
-            } else {
-                printError("Ошибка. Присваемаемое значение не соответствует типу переменной. строка ");
-                return ERROR;
+            if (tec_iterat == TYPE_IN) {
+                val.valueT.setValue(Integer.parseInt(sc.number));
+                val.LexType = INT;
+            }else if(tec_iterat == TYPE_DOUBL) {
+                val.valueT.setValue(Double.parseDouble(sc.number));
+                val.LexType = DOUBLE;
             }
+
+           // val.LexType = tec_iterat;
+            getNextLex();
+            return OK;
         } else
             return NEXT;
+    }
+    public int operation(Node n1, Node n2, int typeOperation){
+        if(flInt == 1){
+            int type1 = n1.LexType;
+            int type2 = n2.LexType;
+            if(type1 == TYPE_UNIKNOW || type2 == TYPE_UNIKNOW||(type1 != INT && type1 != DOUBLE)){
+                return ERROR;
+            }else{
+                switch (typeOperation){
+                    case PLUS:
+                        switch (type1){
+                            case INT:
+                                switch (type2){
+                                    case INT:
+                                        int sum = (int)n1.valueT.getValue();
+                                        sum+=(int)n2.valueT.getValue();
+                                        n1.valueT.setValue(sum);
+                                        break;
+                                    case DOUBLE:
+                                        double sumID = 0;
+                                        sumID += (int)n1.valueT.getValue();
+                                        double ti2 = (double)n2.valueT.getValue();
+                                        sumID+=ti2;
+                                        n1.valueT.setValue(sumID);
+                                        n1.LexType = DOUBLE;
+                                        break;
+                                    default: break;
+                                }
+
+                                break;
+                            case DOUBLE:
+                                switch (type2){
+                                    case INT:
+                                        double sumDI = (double)n1.valueT.getValue();
+                                        int t2 = (int)n2.valueT.getValue();
+                                        sumDI+= (double)t2;
+                                        n1.valueT.setValue(sumDI);
+                                        break;
+                                    case DOUBLE:
+                                        double sumDD = (double)n1.valueT.getValue();
+                                        double t2d = (double)n2.valueT.getValue();
+                                        sumDD+= t2d;
+                                        n1.valueT.setValue(sumDD);
+                                        break;
+                                    default:break;
+                                }
+
+                                break;
+                        }
+                        break;
+                    case MINUS:
+                        switch (type1){
+                            case INT:
+                                switch (type2){
+                                    case INT:
+                                        int min = (int)n1.valueT.getValue();
+                                        min-=(int)n2.valueT.getValue();
+                                        n1.valueT.setValue(min);
+                                        break;
+                                    case DOUBLE:
+                                        double minID = 0;
+                                        minID += (int)n1.valueT.getValue();
+                                        double ti2 = (double)n2.valueT.getValue();
+                                        minID-=(int)ti2;
+                                        n1.valueT.setValue(minID);
+                                        n1.LexType = DOUBLE;
+                                        break;
+                                    default: break;
+                                }
+
+                                break;
+                            case DOUBLE:
+                                switch (type2){
+                                    case INT:
+                                        double minDI = (double)n1.valueT.getValue();
+                                        int t2 = (int)n2.valueT.getValue();
+                                        minDI-= Double.valueOf(t2);
+                                        n1.valueT.setValue(minDI);
+                                        break;
+                                    case DOUBLE:
+                                        double minDD = (double)n1.valueT.getValue();
+                                        double t2d = (double)n2.valueT.getValue();
+                                        minDD-= t2d;
+                                        n1.valueT.setValue(minDD);
+                                        break;
+                                    default:break;
+                                }
+
+                                break;
+                        }
+                        break;
+                    case STAR:
+                        switch (type1){
+                            case INT:
+                                switch (type2){
+                                    case INT:
+                                        int star = (int)n1.valueT.getValue();
+                                        star*=(int)n2.valueT.getValue();
+                                        n1.valueT.setValue(star);
+                                        break;
+                                    case DOUBLE:
+                                        double starI = 0;
+                                        starI += (int)n1.valueT.getValue();
+                                        double t2 = (double)n2.valueT.getValue();
+                                        starI *= (int)t2;
+                                        int res = (int)starI;
+                                        n1.valueT.setValue(res);
+                                        break;
+                                    default: break;
+
+                                }
+                                break;
+                            case DOUBLE:
+                                switch (type2){
+                                    case INT:
+                                        double star = (double)n1.valueT.getValue();
+                                        int t2 = (int)n2.valueT.getValue();
+                                        star*=t2;
+                                        n1.valueT.setValue(star);
+                                        break;
+                                    case DOUBLE:
+                                        double starDD = (double)n1.valueT.getValue();
+                                        double t2I = (double)n2.valueT.getValue();
+                                        starDD*= t2I;
+                                        n1.valueT.setValue(starDD);
+                                        break;
+                                    default: break;
+
+                                }
+
+                                break;
+                        }
+
+                        break;
+                    case SLASH:
+                        switch (type1){
+                            case INT:
+                                switch (type2){
+                                    case INT:
+                                        if((int)n2.valueT.getValue() == 0){
+                                            printError("деление на 0 в строке ");
+                                        }else {
+                                            double minI = 0;
+                                            minI += (int) n1.valueT.getValue();
+                                            minI /= (int) n2.valueT.getValue();
+                                            n1.valueT.setValue(minI);
+                                            n1.LexType = DOUBLE;
+                                        }
+                                        break;
+                                    case DOUBLE:
+                                        if((int)n2.valueT.getValue() == 0.0){
+                                            printError("деление на 0 в строке ");
+                                        }else {
+                                            double minID = 0.0;
+                                            minID += (int) n1.valueT.getValue();
+                                            double t2 = (double) n2.valueT.getValue();
+                                            minID /= (int) t2;
+                                            n1.valueT.setValue(minID);
+                                        }
+                                        break;
+                                    default:break;
+                                }
+
+                                break;
+                            case DOUBLE:
+                                switch (type2){
+                                    case INT:
+                                        if((int)n2.valueT.getValue() == 0){
+                                            printError("деление на 0 в строке ");
+                                        }else {
+                                            double min = (double) n1.valueT.getValue();
+                                            int t2 = (int) n2.valueT.getValue();
+                                            min /= Double.valueOf(t2);
+                                            n1.valueT.setValue(min);
+                                        }
+                                        break;
+                                    case DOUBLE:
+                                        if((double)n2.valueT.getValue() == 0.0){
+                                            printError("деление на 0 в строке ");
+                                        }else {
+                                            double minDD = (double) n1.valueT.getValue();
+                                            minDD /= (double) n2.valueT.getValue();
+                                            n1.valueT.setValue(minDD);
+                                        }
+                                        break;
+                                    default:break;
+                                }
+
+
+                                break;
+                        }
+
+                        break;
+                    default:
+                        System.out.println("че за операция?");
+                }
+            }
+
+        }
+        return OK;
     }
 }
