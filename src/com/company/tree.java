@@ -13,6 +13,7 @@ class Node {
     String IdClassLex; //идентификатор класса, к которому принадлежит лексема
     DATA_TYPE TypeOfLex;   // вид лексемы-конструкции
     String NameLex;//имя лексемы - идентификатор
+    int uk_iterat;
 
     ValueType valueT; // значение переменной
 
@@ -80,6 +81,11 @@ class Node {
 
     Node copy() {
         return new Node(LexType, TypeOfLex, IdClassLex, NameLex);
+    }
+
+    public void set_iterat(int save_tec_iter) {
+        uk_iterat = save_tec_iter;
+
     }
 }
 
@@ -151,7 +157,7 @@ public class tree {
     tree FindInClass(tree From, String nameLex, DATA_TYPE typeOfLex) {
         tree i = From;
         String nameClass = i.n.IdClassLex;
-        while ((i != null) && i.n.IdClassLex.equals(nameClass)) {
+        while ((i != null)) {
             if (nameLex.equals(i.n.NameLex) && i.n.TypeOfLex == typeOfLex) {
                 return i;
             }
@@ -249,7 +255,7 @@ public class tree {
         v.addLast(Cur);
         copy.Up = Cur;
         Cur.Right = copy;
-        SetCur();
+        //SetCur();
 
         return v.getLast();
     }
@@ -257,7 +263,7 @@ public class tree {
     tree SemInclude(int TypeLexA, DATA_TYPE t, String IdClass, String nameLex) {
         // занесение идентификатора a в таблицу с типом t
         //если нашли уже в дереве
-
+        PrintError("Внесли ", nameLex);
         if (t == DATA_TYPE.TYPE_CLASS) {
             if (Cur == null) {
                 Cur = new tree();
@@ -322,7 +328,8 @@ public class tree {
     tree SemGetClass(String NameLex) {
         // найти в таблице класс с именем TypeLexA
         // и вернуть ссылку на соответствующий элемент дерева
-        tree v = FindUpOneLevel(Cur, NameLex, DATA_TYPE.TYPE_CLASS);
+        tree v = FindInClass(Cur,NameLex,DATA_TYPE.TYPE_CLASS);
+        //tree v = FindUpOneLevel(Cur, NameLex, DATA_TYPE.TYPE_CLASS);
         if (v == null) {
             PrintError("Отсутствует описание класса ", NameLex);
         } else if (v.n.TypeOfLex != DATA_TYPE.TYPE_CLASS) {

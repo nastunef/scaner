@@ -8,6 +8,7 @@ public class MyScanner {
     public int str;
     public String nameId;
     public String number;
+    int history;
     public int MAXLEX = 15;
 
     public MyScanner() {
@@ -15,7 +16,12 @@ public class MyScanner {
         tek_i = 0;
         str = 1;
     }
-
+    public int getTek_i(){
+        return tek_i;
+    }
+    public void setTek_i(int newTec){
+        tek_i = newTec;
+    }
     public boolean Num(char t) {
         if (t >= '0' && t <= '9')
             return true;
