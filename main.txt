@@ -7,9 +7,9 @@ class main {
                 double f = 1.5e0;
                 double x = 2.5e0 ;
                 double c;
-                while(f <= x){
+                while(f <= x+1){
                     f = f + 1;
-                    return f;
+
                 }
                 int w = x;
                 int q = 7;

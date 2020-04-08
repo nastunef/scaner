@@ -133,11 +133,9 @@ public class SyntaxAnalize {
                 } else return ERROR;
             }
             if (tec_iterat == CURLY_BRACE_CLOSE) {
-                //if(flInt == 1) {
 
                 TREE = TREE.SetCur();
                 iForClass--;
-                //}
                 getNextLex();
                 return END;//END
             } else {
@@ -154,7 +152,6 @@ public class SyntaxAnalize {
             if (tec_iterat == ID) {
                 nameClass = sc.nameId;
                 Type_lex = OBJECT_CLASS;
-                //int save_iter = sc.getTek_i()-1;
                 getNextLex();
                 if (tec_iterat == ID) {
                     //проверка классса есть ли такой класс
@@ -243,7 +240,7 @@ public class SyntaxAnalize {
                     if (TREE == null) {
                         return ERROR;
                     }
-                    //запомнить указатель на метод
+                    //запомнить указатель на метод(чтобы при вызове найти строку с методом)
                     TREE.n.uk_iterat = sc.getTek_i() - 1;
                     if (sc.nameId.equals("Main")) {
                         flInt = 1;
@@ -261,9 +258,7 @@ public class SyntaxAnalize {
                             if (flInt == 0) {
                                 TREE = TREE.SetCur();
                             }
-                            //TREE = TREE.Up;
                             Type_method = 0;
-
                             getNextLex();
                             return OK;
                         } else {
@@ -342,7 +337,6 @@ public class SyntaxAnalize {
 
     public int ItsNameN(Node val) {
         //ПРОВЕРКА НА СУЩЕСТВОВАНИЕ ПЕРЕМЕННОЙ
-        //перед входом в эту функцию обнулить глобаньную
         //найти в дереве(это может быть функцией)
         if (treeForSearch == null) {
             treeForSearch = TREE;
@@ -391,7 +385,7 @@ public class SyntaxAnalize {
                 }
             }
             if (tec_iterat != ROUND_BRACE_OPEN) {
-                //searchNode = treeForSearch.FindUpOneLevel(treeForSearch, sc.nameId, com.company.DATA_TYPE.TYPE_PEREMEN);
+              
                 if ((searchNode != null && flInt == 1) || flInt == 0) {
                     if (tec_iterat == DOT) {
                         printError(sc.nameId + " это переменная, послне нее не должно быть точки. Строка ");
@@ -410,7 +404,7 @@ public class SyntaxAnalize {
                             }
                             return OK;
                         } else {
-                            printError("1Несоответствие типов в строке ");
+                            printError("Несоответствие типов в строке ");
                             return ERROR;
                         }
                     }
@@ -440,21 +434,28 @@ public class SyntaxAnalize {
                         sc.setTek_i(searchNode.n.uk_iterat);
                         tree saveTREE = TREE;
                         TREE = searchNode;
+                        if(TREE.Right== null){
+                            TREE.Right = new tree();
+                        }
+                        TREE = TREE.Right;
+                        tree save_cur = tree.getCur();
+                        tree.setCur(TREE);
                         System.out.println("Вызов функции " + sc.nameId);
                         returnOK = false;
-
+                        //TREE.SetCur();
                         if (ItsMethod() == ERROR) {
                             return ERROR;
                         }
-                        flInt=1;
-                        //val.valueT.setValue(TREE.n.valueT.getValue());
-                        //val.LexType = TREE.n.LexType;
+                        flInt = 1;
                         TREE = saveTREE;
+                        tree.setCur(save_cur);
                         sc.setTek_i(save);
                         getNextLex();
                         val.valueT.setValue(searchNode.n.valueT.getValue());
                         val.LexType = searchNode.n.LexType;
                         System.out.println("Функция " + searchNode.n.NameLex + " вернула " + val.getValueT());
+                        //обнуляем значение функции
+                        searchNode.n.valueT = new ValueType();
                         returnOK = false;
                         getNextLex();
 
@@ -464,7 +465,6 @@ public class SyntaxAnalize {
                 printError("Неопределенная переменная. Строка " + sc.nameId);
                 return ERROR;
             }
-
         }
         return NEXT;
     }
@@ -541,7 +541,6 @@ public class SyntaxAnalize {
                     return OK;
                 } else if (a == ERROR)
                     return ERROR;
-
             }
         }
         return NEXT;
@@ -562,7 +561,6 @@ public class SyntaxAnalize {
         } else {
             printError("Несоответсвие типов в строке ");
         }
-        //search.Print();
     }
 
     public int ItsReturn() {
@@ -574,10 +572,12 @@ public class SyntaxAnalize {
             Node val = new Node();
             if (expression1(val) == OK) {
                 if (tec_iterat == COMMA) {
-                    //записать итог
-
+                    
                     if (flInt == 1) {
                         if(returnOK == false) {
+
+                            //записать итог
+
                             addValue(methodTree, val);
                             returnOK = true;
                             flInt = 0;
@@ -608,9 +608,8 @@ public class SyntaxAnalize {
             if (tec_iterat == ROUND_BRACE_OPEN) {
                 int save_sc = sc.getTek_i();
 
-                //сохраняем указатель в тексте
+                //сохраняем флаг
                 int localFlInt = flInt;
-                start:
                 do {
                     getNextLex();
 
@@ -1041,18 +1040,16 @@ public class SyntaxAnalize {
 
                         break;
                     case EQUAL:
-                            //double a = (double)n1.getValueT();
-                            //printError(n2.getValueT().toString());
 
                         if (n1.valueT.getValue().equals( n2.valueT.getValue())) {
-                            printError("Цикл");
+                            System.out.println("Выражение истинно");
                             return OK;
                         } else {
                             return ERROR;
                         }
                     case NOT_EQUAL:
                         if (!n1.valueT.getValue().equals( n2.valueT.getValue())) {
-                            printError("Цикл");
+                            System.out.println("Выражение истинно");
                             return OK;
                         } else {
                             return ERROR;
@@ -1061,7 +1058,7 @@ public class SyntaxAnalize {
                         double a = (double)n1.valueT.getValue();
                         double b = (double)  n2.valueT.getValue();
                         if (a > b){
-                            printError("Цикл");
+                            System.out.println("Выражение истинно");
                             return OK;
                         } else {
                             return ERROR;
@@ -1070,7 +1067,7 @@ public class SyntaxAnalize {
                         double a1 = (double)n1.valueT.getValue();
                         double b1 = (double)  n2.valueT.getValue();
                         if (a1 >= b1){
-                            printError("Цикл");
+                            System.out.println("Выражение истинно");
                             return OK;
                         } else {
                             return ERROR;
@@ -1079,7 +1076,7 @@ public class SyntaxAnalize {
                         double a2 = (double)n1.valueT.getValue();
                         double b2 = (double)  n2.valueT.getValue();
                         if (a2 <= b2){
-                            printError("Цикл");
+                            System.out.println("Выражение истинно");
                             return OK;
                         } else {
                             return ERROR;
@@ -1088,7 +1085,7 @@ public class SyntaxAnalize {
                         double a3 = (double)n1.valueT.getValue();
                         double b3 = (double)  n2.valueT.getValue();
                         if (a3 < b3){
-                            printError("Цикл");
+                            System.out.println("Выражение истинно");
                             return OK;
                         } else {
                             return ERROR;

@@ -24,29 +24,6 @@ class Node {
     public void setValueT(ValueType valueT) {
         this.valueT = valueT;
     }
-    public void setIntInInt(int value){
-        ValueType newValue = new ValueType();
-        newValue.setValue(value);
-        setValueT(newValue);
-    }
-    public void setIntInDouble(int value){
-        ValueType newValue = new ValueType();
-        double doubleValue = (double)value;
-        newValue.setValue(doubleValue);
-        setValueT(newValue);
-    }
-    public void setDoubleInDouble(double value){
-        ValueType newValue = new ValueType();
-        newValue.setValue(value);
-        setValueT(newValue);
-    }
-    public void setDoubleInInt(int value){
-        ValueType newValue = new ValueType();
-        double intValue = (int)value;
-        newValue.setValue(intValue);
-        setValueT(newValue);
-    }
-
 
     Node() {
         valueT = new ValueType();
@@ -69,24 +46,10 @@ class Node {
         valueT.setValue(newValue);
     }
 
-    Node(int LT, DATA_TYPE ToL, String IC, String NL, int newValue) {
-        LexType = LT;
-        TypeOfLex = ToL;
-        IdClassLex = IC;
-        NameLex = NL;
-        valueT = new ValueType();
-        valueT.setValue(newValue);
-    }
-
-
     Node copy() {
         return new Node(LexType, TypeOfLex, IdClassLex, NameLex);
     }
 
-    public void set_iterat(int save_tec_iter) {
-        uk_iterat = save_tec_iter;
-
-    }
 }
 
 public class tree {
@@ -108,6 +71,14 @@ public class tree {
         Up = null;
         Left = null;
         Right = null;
+    }
+
+    public static tree getCur() {
+        return Cur;
+    }
+
+    public static void setCur(tree cur) {
+        Cur = cur;
     }
 
     public static tree Cur;

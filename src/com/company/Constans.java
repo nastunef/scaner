@@ -61,7 +61,24 @@ public class Constans {
     static final int T_NAME = 161;
     static final int T_NAME2 = 162;
     static final int T_TYPE = 163;
-
     static final int T_ASSIGN = 165;
+
+    static final int DEL_SET_CLASS = 170;
+    static final int DEL_NEW_LEVEL = 171;
+    static final int DEL_END_LEVEL = 172;
+    static final int DEL_MATCH = 173;
+    static final int DEL_MATCH_LEFT = 174;
+    static final int DEL_FIND = 175;
+    static final int DEL_SET_VAR = 176;
+    static final int DEL_SET_FUNC = 177;
+    static final int DEL_PUSH = 178;
+    static final int DEL_PUSH_INT_CONST = 179;
+    static final int DEL_PUSH_DOUBLE_CONST = 180;
+    static final int DEL_ITS_VAR = 181;
+    static final int DEL_CHECK_RETURN = 182;
+    static final int DEL_CHECK_TYPE_CLASS = 183;
+    static final int DEL_SAVE_TYPE = 184;
+    static final int DEL_FIND_IN_TREE_FUNC = 185;
+    static final int DEL_FIND_IN_TREE_VAR = 186;
 
 }
