@@ -36,6 +36,12 @@ class Node {
         NameLex = NL;
         valueT = new ValueType();
     }
+    Node(int LT, DATA_TYPE ToL, String NL) {
+        LexType = LT;
+        TypeOfLex = ToL;
+        NameLex = NL;
+        valueT = new ValueType();
+    }
 
     Node(int LT, DATA_TYPE ToL, String IC, String NL, double newValue) {
         LexType = LT;
@@ -128,7 +134,7 @@ public class tree {
     tree FindInClass(tree From, String nameLex, DATA_TYPE typeOfLex) {
         tree i = From;
         String nameClass = i.n.IdClassLex;
-        while ((i != null)) {
+        while (i != null && i.n.TypeOfLex!=null && i.n.NameLex!=null) {
             if (nameLex.equals(i.n.NameLex) && i.n.TypeOfLex == typeOfLex) {
                 return i;
             }
@@ -152,7 +158,17 @@ public class tree {
 
         System.out.println("Вершина с данными: " + n.NameLex);
         System.out.println("Значение: "+ n.getValueT());
-        System.out.println("Тип данных: " + n.LexType);
+        if(n.LexType == 16){
+            System.out.println("Тип данных: экземпляр класса");
+        }else if(n.LexType == 11){
+            System.out.println("Тип данных: int" );
+        }else if(n.LexType == 12){
+            System.out.println("Тип данных: double");
+        }else if(n.LexType == CLASS){
+            System.out.println("Тип данных: класс");
+        }else {
+            System.out.println("Тип данных: " );
+        }
         if (Left != null) System.out.println("слева данные " + Left.n.NameLex);
         if (Right != null) System.out.println("справа данные " + Right.n.NameLex);
         System.out.println("\n");
@@ -324,4 +340,22 @@ public class tree {
     }
 
 
+    public tree FindClass(tree search, String name)
+    {
+        tree i = search;
+        String nameClass = i.n.NameLex;
+        while (i != null ) {
+            if (name.equals(i.n.NameLex) && i.n.TypeOfLex == DATA_TYPE.TYPE_CLASS) {
+                return i;
+            }
+            i = i.Up;
+        }
+        return null;
+    }
+
+    public tree addNode(tree root, Node newNode) {
+        root.setLeft(newNode);
+        root = root.Left;
+        return root;
+    }
 }

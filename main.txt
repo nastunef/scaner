@@ -2,39 +2,22 @@ class main {
      class pop{
             int a1,a2,a3;
             int b;
-            int c;
             int d(){
-                double f = 1.5e0;
-                double x = 2.5e0 ;
-                double c;
-                while(f <= x+1){
-                    f = f + 1;
-
+                double f = 4;
+                while(f <= 1){
+                    int b = 1;
                 }
-                int w = x;
                 int q = 7;
             return q;
             }
-
             int p;
          }
     int bob(){
         return 3;
     }
     int Main(){
-        int ma = bob();
-        int maa = 3/2+2.5e0;
-        double mbb = 3/2 +2.5e0;
-        mbb = 3;
-        mbb= mbb/2 + 2.5e0;
-        int ma3 = 2 + 1 + 3 + 5 - 3 + 5*10 + (10+2);
-        int fileName = 1 - 2.5e-2;
-        int lel = fileName;
-        pop e1 = new pop();
-        int ma5 = e1.d();
+        int ma = new pop();
 
         return 0;
     }
-
-
 }
